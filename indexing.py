@@ -5,6 +5,7 @@ from langchain_community.document_loaders import RecursiveUrlLoader
 from bs4 import BeautifulSoup
 import re
 import sys
+import os
 
 load_dotenv()
 
@@ -37,17 +38,32 @@ embedding_model = OpenAIEmbeddings(
     model="text-embedding-3-small"
 )
 
+# Get Qdrant credentials from environment variables
+qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6333")
+qdrant_api_key = os.getenv("QDRANT_API_KEY")
+
 try:
-    vector_store = QdrantVectorStore.from_documents(
-        documents= docs,
-        embedding=embedding_model,
-        url="http://localhost:6333",
-        collection_name="chai-aur-docs"
-    )
-    print("Indexing complete")
+    # If API key is provided, use Qdrant Cloud, otherwise use local Qdrant
+    if qdrant_api_key:
+        vector_store = QdrantVectorStore.from_documents(
+            documents=docs,
+            embedding=embedding_model,
+            url=qdrant_url,
+            api_key=qdrant_api_key,
+            collection_name="chai-aur-docs"
+        )
+        print(f"Indexing complete on Qdrant Cloud: {qdrant_url}")
+    else:
+        vector_store = QdrantVectorStore.from_documents(
+            documents=docs,
+            embedding=embedding_model,
+            url=qdrant_url,
+            collection_name="chai-aur-docs"
+        )
+        print(f"Indexing complete on local Qdrant: {qdrant_url}")
 except Exception as e:
     print(f"Error connecting to Qdrant: {e}")
-    print("Please ensure Qdrant is running on http://localhost:6333")
+    print(f"Please ensure Qdrant is running on {qdrant_url}")
     print("You can start Qdrant using Docker: docker run -p 6333:6333 qdrant/qdrant")
     sys.exit(1)
 

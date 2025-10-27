@@ -8,6 +8,7 @@ from langchain_qdrant import QdrantVectorStore
 from qdrant_client import models
 from system_prompt import sub_queries_system_prompt, find_pages_system_prompt, context, give_answer_system_prompt
 from qdrant_client import QdrantClient
+import os
 # from langfuse.langchain import CallbackHandler
 
 
@@ -30,11 +31,26 @@ embedding_model = OpenAIEmbeddings(
     model="text-embedding-3-small"
 )
 
-vector_store = QdrantVectorStore.from_existing_collection(
-    url= "http://localhost:6333",
-    embedding=embedding_model,
-    collection_name="chai-aur-docs"
-)
+# Get Qdrant credentials from environment variables
+qdrant_url = os.getenv("QDRANT_URL", "http://localhost:6333")
+qdrant_api_key = os.getenv("QDRANT_API_KEY")
+
+# Connect to Qdrant (Cloud or Local)
+if qdrant_api_key:
+    # Production: Qdrant Cloud
+    vector_store = QdrantVectorStore.from_existing_collection(
+        url=qdrant_url,
+        api_key=qdrant_api_key,
+        embedding=embedding_model,
+        collection_name="chai-aur-docs"
+    )
+else:
+    # Local development: Docker Qdrant
+    vector_store = QdrantVectorStore.from_existing_collection(
+        url=qdrant_url,
+        embedding=embedding_model,
+        collection_name="chai-aur-docs"
+    )
 
 qdrant_client: QdrantClient = vector_store.client
 

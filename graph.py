@@ -14,6 +14,7 @@ import os
 
 
 load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # langfuse_handler = CallbackHandler()
 
@@ -25,7 +26,10 @@ class State(TypedDict):
     llm_result : str | None
     status: str | None
 
-client = OpenAI()
+client = OpenAI(
+    api_key=GEMINI_API_KEY,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
 
 embedding_model = OpenAIEmbeddings(
     model="text-embedding-3-small"
@@ -68,7 +72,7 @@ def generate_sub_queries(state: State):
     SYSTEM_PROMPT = sub_queries_system_prompt
 
     response = client.beta.chat.completions.parse(
-        model="gpt-4o-mini",
+        model="gpt-2.5-flash",
         response_format=SubQueries,
         messages= [
             {"role": "system", "content" : SYSTEM_PROMPT},
@@ -94,7 +98,7 @@ def find_relevant_pages(state: State):
     """
 
     response = client.beta.chat.completions.parse(
-        model="gpt-4o-mini",
+        model="gpt-2.5-flash",
         response_format=URLs,
         messages= [
             {"role": "system", "content" : SYSTEM_PROMPT},
@@ -142,7 +146,7 @@ def give_answer(state: State):
 
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-2.5-pro",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": query}

@@ -11,10 +11,16 @@ app = FastAPI()
 # CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://chai-docs-bot.vercel.app"],  # Restrict in production
+    allow_origins=[
+        "https://chai-docs-bot.vercel.app",
+        "https://chai-docs-bot.vercel.app/",  # With trailing slash
+        "http://localhost:5173",  # Local development
+        "http://localhost:3000",  # Alternative local dev port
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicitly include OPTIONS
     allow_headers=["*"],
+    expose_headers=["*"],  # Expose headers to the browser
 )
 
 # Request schema

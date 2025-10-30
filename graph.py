@@ -72,7 +72,7 @@ def generate_sub_queries(state: State):
     SYSTEM_PROMPT = sub_queries_system_prompt
 
     response = client.beta.chat.completions.parse(
-        model="gpt-2.5-flash",
+        model="gemini-2.5-flash",
         response_format=SubQueries,
         messages= [
             {"role": "system", "content" : SYSTEM_PROMPT},
@@ -98,7 +98,7 @@ def find_relevant_pages(state: State):
     """
 
     response = client.beta.chat.completions.parse(
-        model="gpt-2.5-flash",
+        model="gemini-2.5-flash",
         response_format=URLs,
         messages= [
             {"role": "system", "content" : SYSTEM_PROMPT},
@@ -146,7 +146,7 @@ def give_answer(state: State):
 
 
     response = client.chat.completions.create(
-        model="gpt-2.5-pro",
+        model="gemini-2.5-pro",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": query}

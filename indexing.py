@@ -61,6 +61,17 @@ try:
             collection_name="chai-aur-docs"
         )
         print(f"Indexing complete on local Qdrant: {qdrant_url}")
+    
+    # Create payload index for metadata.source to enable filtering
+    print("Creating payload index for metadata.source...")
+    qdrant_client = vector_store.client
+    qdrant_client.create_payload_index(
+        collection_name="chai-aur-docs",
+        field_name="metadata.source",
+        field_schema="keyword"
+    )
+    print("Payload index created successfully!")
+    
 except Exception as e:
     print(f"Error connecting to Qdrant: {e}")
     print(f"Please ensure Qdrant is running on {qdrant_url}")
